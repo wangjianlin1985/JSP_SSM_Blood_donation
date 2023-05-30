@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.BloodTestMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加献血化验记录 -->
+	<insert id="addBloodTest" parameterType="bloodTest">
+		insert into t_bloodTest(userObj,protein,bloodType,alt,hbsag,antiHCV,antiHIV,meidu,doctor,testTime,testResult) values 
+		(#{userObj.user_name},#{protein},#{bloodType},#{alt},#{hbsag},#{antiHCV},#{antiHIV},#{meidu},#{doctor},#{testTime},#{testResult})
+	</insert>
+
+	<!-- 按照查询条件分页查询献血化验记录 -->
+	<select id="queryBloodTest" resultMap="bloodTestMap" >
+		select t_bloodTest.* from t_bloodTest,t_userInfo ${where} and t_bloodTest.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="bloodTestMap" type="bloodTest">
+        <id property="testId" column="testId" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有献血化验记录 -->
+	<select id="queryBloodTestList" resultMap="bloodTestMap" >
+		select t_bloodTest.* from t_bloodTest,t_userInfo ${where} and t_bloodTest.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的献血化验记录数 -->
+	<select id="queryBloodTestCount" resultType="int">
+		select count(*) from t_bloodTest,t_userInfo ${where} and t_bloodTest.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个献血化验记录 -->
+	<select id="getBloodTest" parameterType="int" resultMap="bloodTestMap">
+		select * from t_bloodTest where t_bloodTest.testId = #{testId}
+	</select>
+
+	<!-- 更新献血化验记录 -->
+	<update id="updateBloodTest" parameterType="bloodTest">
+		update t_bloodTest set userObj=#{userObj.user_name},protein=#{protein},bloodType=#{bloodType},alt=#{alt},hbsag=#{hbsag},antiHCV=#{antiHCV},antiHIV=#{antiHIV},meidu=#{meidu},doctor=#{doctor},testTime=#{testTime},testResult=#{testResult} where testId = #{testId}
+	</update>
+
+	<!-- 删除献血化验记录 -->
+	<delete id="deleteBloodTest" parameterType="int">
+		delete from t_bloodTest where testId=#{testId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.BloodDonateMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加血液捐献记录 -->
+	<insert id="addBloodDonate" parameterType="bloodDonate">
+		insert into t_bloodDonate(userObj,bloodType,donateNumber,loveFlag,donateTime,place,doctor,donateMemo) values 
+		(#{userObj.user_name},#{bloodType},#{donateNumber},#{loveFlag},#{donateTime},#{place},#{doctor},#{donateMemo})
+	</insert>
+
+	<!-- 按照查询条件分页查询血液捐献记录 -->
+	<select id="queryBloodDonate" resultMap="bloodDonateMap" >
+		select t_bloodDonate.* from t_bloodDonate,t_userInfo ${where} and t_bloodDonate.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="bloodDonateMap" type="bloodDonate">
+        <id property="donateId" column="donateId" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有血液捐献记录 -->
+	<select id="queryBloodDonateList" resultMap="bloodDonateMap" >
+		select t_bloodDonate.* from t_bloodDonate,t_userInfo ${where} and t_bloodDonate.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的血液捐献记录数 -->
+	<select id="queryBloodDonateCount" resultType="int">
+		select count(*) from t_bloodDonate,t_userInfo ${where} and t_bloodDonate.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个血液捐献记录 -->
+	<select id="getBloodDonate" parameterType="int" resultMap="bloodDonateMap">
+		select * from t_bloodDonate where t_bloodDonate.donateId = #{donateId}
+	</select>
+
+	<!-- 更新血液捐献记录 -->
+	<update id="updateBloodDonate" parameterType="bloodDonate">
+		update t_bloodDonate set userObj=#{userObj.user_name},bloodType=#{bloodType},donateNumber=#{donateNumber},loveFlag=#{loveFlag},donateTime=#{donateTime},place=#{place},doctor=#{doctor},donateMemo=#{donateMemo} where donateId = #{donateId}
+	</update>
+
+	<!-- 删除血液捐献记录 -->
+	<delete id="deleteBloodDonate" parameterType="int">
+		delete from t_bloodDonate where donateId=#{donateId}
+	</delete>
+
+</mapper>
